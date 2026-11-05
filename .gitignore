@@ -1,0 +1,29 @@
+# Virtual Environments
+venv/
+.venv/
+env/
+ENV/
+
+# Byte-compiled / optimized files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Environment variables & secrets
+.env
+*.local.env
+
+# ChromaDB persistence
+backend/rag/chroma_db/
+chroma_db/
+*.sqlite3
+
+# Logs & temp files
+*.log
+.pytest_cache/
+.coverage
+htmlcov/
+
+# OS generated
+.DS_Store
+Thumbs.db

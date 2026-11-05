@@ -1,0 +1,73 @@
+[
+  {
+    "id": "RULE-CWE-089",
+    "cwe_id": "CWE-89",
+    "name": "SQL Injection (SQLi)",
+    "severity": "CRITICAL",
+    "category": "Injection",
+    "description": "Improper neutralization of special elements in an SQL query constructed via string concatenation, formatting, or interpolation. Untrusted user input can manipulate query logic, bypass authentication, exfiltrate database records, or execute arbitrary database commands.",
+    "patterns_detected": [
+      "cursor.execute(f'...{user_input}...')",
+      "cursor.execute('SELECT ...' + user_input)",
+      "cursor.execute('SELECT ... %s' % user_input)",
+      "db.raw('SELECT ... {}'.format(user_input))"
+    ],
+    "remediation_guidelines": "Always use parameterized queries or prepared statements provided by DB-API 2.0 (e.g., sqlite3, psycopg2, SQLAlchemy). Pass query parameters as a tuple/list to the database driver rather than formatting strings. Never build dynamic SQL strings from untrusted input.",
+    "insecure_example": "cursor.execute(\"SELECT * FROM users WHERE id = '\" + uid + \"'\")",
+    "secure_example": "cursor.execute(\"SELECT * FROM users WHERE id = %s\", (uid,))",
+    "tags": ["sql", "sqli", "injection", "database", "query", "cwe-89"]
+  },
+  {
+    "id": "RULE-CWE-095",
+    "cwe_id": "CWE-95",
+    "name": "Improper Neutralization of Directives in Dynamically Evaluated Code (Remote Code Execution / Dynamic Eval)",
+    "severity": "CRITICAL",
+    "category": "Code Execution",
+    "description": "Dynamic execution of untrusted input using eval(), exec(), __import__(), or compile(). Allows attackers to inject arbitrary Python expressions or statements, resulting in complete system compromise, arbitrary command execution, or process hijacking.",
+    "patterns_detected": [
+      "eval(user_input)",
+      "exec(dynamic_code)",
+      "__import__(user_module)",
+      "compile(user_input, '<string>', 'exec')"
+    ],
+    "remediation_guidelines": "Avoid eval() and exec() entirely. For parsing literal Python data structures (dicts, lists, numbers), use the safe ast.literal_eval() function. For dynamic arithmetic, use dedicated expression parsers or static dispatch tables (mapping operators to predefined functions).",
+    "insecure_example": "result = eval(user_expression)",
+    "secure_example": "import ast\nresult = ast.literal_eval(safe_literal_string)",
+    "tags": ["eval", "exec", "rce", "code execution", "dynamic code", "cwe-95"]
+  },
+  {
+    "id": "RULE-CWE-798",
+    "cwe_id": "CWE-798",
+    "name": "Use of Hard-coded Credentials",
+    "severity": "HIGH",
+    "category": "Authentication",
+    "description": "Hardcoding cryptographic keys, database passwords, API tokens, or secrets directly in source code. Once committed, credentials can be harvested from version control history, decompiled binaries, or leaked repository dumps.",
+    "patterns_detected": [
+      "API_KEY = 'AIzaSy...'",
+      "SECRET_KEY = 'super_secret_token_123'",
+      "PASSWORD = 'admin_password'",
+      "db_connect(user='root', password='mypassword')"
+    ],
+    "remediation_guidelines": "Extract secrets and credentials into external environment variables, secrets management services (e.g., AWS Secrets Manager, HashiCorp Vault, GCP Secret Manager), or secure .env files excluded from source control (.gitignore). Use os.environ.get() or Pydantic BaseSettings to read configuration.",
+    "insecure_example": "API_KEY = 'AIzaSyD-1234567890abcdef'",
+    "secure_example": "import os\nAPI_KEY = os.environ.get('API_KEY')\nif not API_KEY:\n    raise ValueError('API_KEY environment variable is required')",
+    "tags": ["secrets", "hardcoded credentials", "passwords", "tokens", "api key", "cwe-798"]
+  },
+  {
+    "id": "RULE-CWE-400",
+    "cwe_id": "CWE-400",
+    "name": "Uncontrolled Resource Consumption (Regular Expression Denial of Service - ReDoS)",
+    "severity": "HIGH",
+    "category": "Resource Management",
+    "description": "Use of vulnerable regular expressions with overlapping, nested quantifiers (e.g., (a+)+, (a|a)+) applied to untrusted user input, causing polynomial or exponential catastrophic backtracking in standard NFA regex engines.",
+    "patterns_detected": [
+      "re.compile(r'^(a+)+$')",
+      "re.match(r'([a-zA-Z0-9]+)*$', input_str)",
+      "re.search(r'(x+x+)+y', text)"
+    ],
+    "remediation_guidelines": "Simplify regex patterns to eliminate ambiguous nested quantifiers. Use atomic grouping or possessive quantifiers where supported, validate input string lengths before running regex evaluations, or employ linear-time regex engines (such as google-re2).",
+    "insecure_example": "email_pattern = re.compile(r'^([a-zA-Z0-9_.-]+)+@([a-zA-Z0-9.-]+)+$')",
+    "secure_example": "email_pattern = re.compile(r'^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\\.[a-zA-Z0-9-.]+$')\nif len(user_input) > 254:\n    return False",
+    "tags": ["redos", "regex", "dos", "denial of service", "resource consumption", "cwe-400"]
+  }
+]

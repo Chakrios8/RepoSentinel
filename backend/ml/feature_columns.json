@@ -1,0 +1,10 @@
+[
+  "lines_of_code",
+  "num_functions",
+  "max_nesting_depth",
+  "num_branches",
+  "num_imports",
+  "num_external_calls",
+  "has_eval_or_exec",
+  "has_raw_sql_indicators"
+]
